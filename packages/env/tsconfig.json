@@ -1,0 +1,3 @@
+{
+  "extends": "@novels-balls-deep/config/tsconfig.base.json"
+}

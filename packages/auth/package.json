@@ -1,0 +1,24 @@
+{
+  "name": "@novels-balls-deep/auth",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {},
+  "dependencies": {
+    "@novels-balls-deep/db": "workspace:*",
+    "@novels-balls-deep/env": "workspace:*",
+    "better-auth": "catalog:",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@novels-balls-deep/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}
