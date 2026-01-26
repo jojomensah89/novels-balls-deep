@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "@novels-balls-deep/env": "workspace:*",
+    "axios": "^1.13.3",
     "dotenv": "catalog:",
     "zod": "catalog:"
   },

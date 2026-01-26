@@ -1,0 +1,24 @@
+{
+    "name": "@novels-balls-deep/scraper",
+    "version": "0.0.1",
+    "private": true,
+    "type": "module",
+    "exports": {
+        ".": "./src/index.ts",
+        "./types": "./src/types.ts",
+        "./sources/*": "./src/sources/*.ts"
+    },
+    "scripts": {
+        "test": "bun test",
+        "test:all": "bun run src/test-all.ts"
+    },
+    "dependencies": {
+        "axios": "catalog:",
+        "cheerio": "^1.0.0",
+        "p-limit": "^6.1.0"
+    },
+    "devDependencies": {
+        "@types/node": "^22.13.14",
+        "typescript": "catalog:"
+    }
+}
