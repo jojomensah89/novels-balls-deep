@@ -18,16 +18,12 @@ app.get('/search', zValidator('query', searchSchema), async (c) => {
     const { q, page, limit } = c.req.valid('query')
     const offset = (page - 1) * limit
 
-    const novels = await db.query.novel.findMany({
-        where: like(novel.title, `%${q}%`),
-        limit,
-        offset,
-        with: {
-            novelToGenres: {
-                with: { genre: true },
-            },
-        },
-    })
+    const novels = await db
+        .select()
+        .from(novel)
+        .where(like(novel.title, `%${q}%`))
+        .limit(limit)
+        .offset(offset)
 
     return c.json({
         data: novels,
@@ -40,10 +36,11 @@ app.get('/', optionalAuth, zValidator('query', listNovelsSchema), async (c) => {
     const { page, limit, status, sortBy, order } = c.req.valid('query')
     const offset = (page - 1) * limit
 
-    // Build where conditions
-    const conditions = []
+    // Build where clause
+    let query = db.select().from(novel)
+
     if (status) {
-        conditions.push(eq(novel.status, status))
+        query = query.where(eq(novel.status, status)) as any
     }
 
     // Determine order by column
@@ -62,18 +59,10 @@ app.get('/', optionalAuth, zValidator('query', listNovelsSchema), async (c) => {
             orderByColumn = novel.updatedAt
     }
 
-    const novels = await db.query.novel.findMany({
-        where: conditions.length > 0 ? and(...conditions) : undefined,
-        limit,
-        offset,
-        orderBy: order === 'asc' ? asc(orderByColumn) : desc(orderByColumn),
-        with: {
-            novelToGenres: {
-                with: { genre: true },
-            },
-            translations: true,
-        },
-    })
+    const novels = await query
+        .limit(limit)
+        .offset(offset)
+        .orderBy(order === 'asc' ? asc(orderByColumn) : desc(orderByColumn))
 
     return c.json({
         data: novels,
@@ -89,28 +78,17 @@ app.get('/', optionalAuth, zValidator('query', listNovelsSchema), async (c) => {
 app.get('/:slug', zValidator('param', novelSlugSchema), async (c) => {
     const { slug } = c.req.valid('param')
 
-    const novelData = await db.query.novel.findFirst({
-        where: eq(novel.slug, slug),
-        with: {
-            novelToGenres: {
-                with: { genre: true },
-            },
-            translations: {
-                with: {
-                    chapters: {
-                        limit: 5,
-                        orderBy: (chapter, { desc }) => [desc(chapter.chapterNumber)],
-                    },
-                },
-            },
-        },
-    })
+    const novelData = await db
+        .select()
+        .from(novel)
+        .where(eq(novel.slug, slug))
+        .limit(1)
 
-    if (!novelData) {
+    if (!novelData || novelData.length === 0) {
         return c.json({ error: 'Novel not found' }, 404)
     }
 
-    return c.json({ data: novelData })
+    return c.json({ data: novelData[0] })
 })
 
 export default app

@@ -17,41 +17,50 @@ const app = new Hono<Env>()
 // Create or update rating
 app.post('/', requireAuth, zValidator('json', createRatingSchema), async (c) => {
     const user = c.get('user')
-    const data = c.req.valid('json')
+    const { translationId, rating, review } = c.req.valid('json')
 
     // Check if rating exists
-    const existing = await db.query.translationRating.findFirst({
-        where: and(
-            eq(translationRating.userId, user.id),
-            eq(translationRating.translationId, data.translationId)
-        ),
-    })
+    const existing = await db
+        .select()
+        .from(translationRating)
+        .where(
+            and(
+                eq(translationRating.userId, user.id),
+                eq(translationRating.translationId, translationId)
+            )
+        )
+        .limit(1)
 
-    if (existing) {
+    if (existing && existing.length > 0) {
         // Update existing rating
-        await db
+        const updated = await db
             .update(translationRating)
             .set({
-                rating: data.rating,
-                review: data.review,
+                rating,
+                review,
                 updatedAt: new Date(),
             })
-            .where(eq(translationRating.id, existing.id))
+            .where(eq(translationRating.id, existing[0].id))
+            .returning()
 
-        return c.json({ message: 'Rating updated', id: existing.id })
+        return c.json({ data: updated[0] })
     }
 
     // Create new rating
-    const id = nanoid()
-    await db.insert(translationRating).values({
-        id,
-        userId: user.id,
-        translationId: data.translationId,
-        rating: data.rating,
-        review: data.review,
-    })
+    const newRating = await db
+        .insert(translationRating)
+        .values({
+            id: nanoid(),
+            userId: user.id,
+            translationId,
+            rating,
+            review,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        })
+        .returning()
 
-    return c.json({ message: 'Rating created', id }, 201)
+    return c.json({ data: newRating[0] }, 201)
 })
 
 // Delete rating
@@ -59,22 +68,24 @@ app.delete('/:id', requireAuth, zValidator('param', ratingIdSchema), async (c) =
     const user = c.get('user')
     const { id } = c.req.valid('param')
 
-    // Verify ownership
-    const rating = await db.query.translationRating.findFirst({
-        where: eq(translationRating.id, id),
-    })
+    const rating = await db
+        .select()
+        .from(translationRating)
+        .where(eq(translationRating.id, id))
+        .limit(1)
 
-    if (!rating) {
+    if (!rating || rating.length === 0) {
         return c.json({ error: 'Rating not found' }, 404)
     }
 
-    if (rating.userId !== user.id) {
-        return c.json({ error: 'Forbidden' }, 403)
+    // Verify ownership
+    if (rating[0].userId !== user.id) {
+        return c.json({ error: 'Unauthorized' }, 403)
     }
 
     await db.delete(translationRating).where(eq(translationRating.id, id))
 
-    return c.json({ message: 'Rating deleted' })
+    return c.json({ success: true })
 })
 
 export default app
