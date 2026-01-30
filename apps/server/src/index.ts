@@ -14,6 +14,10 @@ import { errorHandler } from "./middleware/error-handler";
 import novels from "./routes/novels";
 import chapters from "./routes/chapters";
 import ratings from "./routes/ratings";
+import translations from "./routes/translations";
+import reading from "./routes/reading";
+import users from "./routes/users";
+import admin from "./routes/admin";
 
 // Types for Hono context
 type Env = {
@@ -55,6 +59,10 @@ app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 app.route("/api/novels", novels);
 app.route("/api/chapters", chapters);
 app.route("/api/ratings", ratings);
+app.route("/api/translations", translations);
+app.route("/api/reading", reading);
+app.route("/api/users", users);
+app.route("/api/admin", admin);
 
 // Health check
 app.get("/health", (c) => c.json({ status: "ok", timestamp: Date.now() }));

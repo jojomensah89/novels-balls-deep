@@ -1,11 +1,16 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { auth } from "@novels-balls-deep/auth";
+import { authClient } from "@/lib/auth-client";
+
+import Dashboard from "./dashboard";
 
 export default async function DashboardPage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
+  const session = await authClient.getSession({
+    fetchOptions: {
+      headers: await headers(),
+      throw: true,
+    },
   });
 
   if (!session?.user) {
@@ -16,6 +21,7 @@ export default async function DashboardPage() {
     <div>
       <h1>Dashboard</h1>
       <p>Welcome {session.user.name}</p>
+      <Dashboard session={session} />
     </div>
   );
 }
