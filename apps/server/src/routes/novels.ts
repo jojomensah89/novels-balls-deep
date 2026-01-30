@@ -47,11 +47,27 @@ app.get('/', optionalAuth, zValidator('query', listNovelsSchema), async (c) => {
         conditions.push(eq(novel.status, status))
     }
 
+    // Determine order by column
+    let orderByColumn
+    switch (sortBy) {
+        case 'title':
+            orderByColumn = novel.title
+            break
+        case 'popularity':
+            orderByColumn = novel.views
+            break
+        case 'rating':
+            orderByColumn = novel.views // Fallback to views
+            break
+        default:
+            orderByColumn = novel.updatedAt
+    }
+
     const novels = await db.query.novel.findMany({
         where: conditions.length > 0 ? and(...conditions) : undefined,
         limit,
         offset,
-        orderBy: order === 'asc' ? asc(novel[sortBy]) : desc(novel[sortBy]),
+        orderBy: order === 'asc' ? asc(orderByColumn) : desc(orderByColumn),
         with: {
             novelToGenres: {
                 with: { genre: true },
