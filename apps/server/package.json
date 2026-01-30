@@ -14,7 +14,7 @@
     "@novels-balls-deep/env": "workspace:*",
     "better-auth": "catalog:",
     "dotenv": "catalog:",
-    "hono": "^4.8.2",
+    "hono": "^4.11.7",
     "nanoid": "^5.1.6",
     "zod": "catalog:"
   },

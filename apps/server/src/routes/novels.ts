@@ -1,10 +1,9 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
-import { db } from '@novels-balls-deep/db'
+import { db, eq, like, desc, asc, and } from '@novels-balls-deep/db'
 import { novel } from '@novels-balls-deep/db/schema'
 import { listNovelsSchema, novelSlugSchema, searchSchema } from '../schemas/novels'
 import { optionalAuth } from '../middleware/auth'
-import { eq, like, desc, asc, and } from 'drizzle-orm'
 
 type Env = {
     Variables: {

@@ -7,6 +7,9 @@
     },
     "./schema": {
       "default": "./src/schema/index.ts"
+    },
+    "./schema/auth": {
+      "default": "./src/schema/auth.ts"
     }
   },
   "scripts": {

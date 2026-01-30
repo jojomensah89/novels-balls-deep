@@ -1,10 +1,9 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
-import { db } from '@novels-balls-deep/db'
+import { db, eq, and } from '@novels-balls-deep/db'
 import { translationRating } from '@novels-balls-deep/db/schema'
 import { requireAuth } from '../middleware/auth'
 import { createRatingSchema, ratingIdSchema } from '../schemas/ratings'
-import { eq, and } from 'drizzle-orm'
 import { nanoid } from 'nanoid'
 
 type Env = {
