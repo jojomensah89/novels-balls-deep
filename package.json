@@ -15,7 +15,8 @@
       "alchemy": "^0.82.1",
       "wrangler": "^4.54.0",
       "@libsql/client": "0.15.15",
-      "libsql": "0.5.22"
+      "libsql": "0.5.22",
+      "axios": "^1.7.9"
     }
   },
   "type": "module",
@@ -33,7 +34,7 @@
   },
   "dependencies": {
     "@novels-balls-deep/env": "workspace:*",
-    "axios": "^1.13.3",
+    "axios": "catalog:",
     "dotenv": "catalog:",
     "zod": "catalog:"
   },

@@ -3,24 +3,73 @@ import { env } from "@novels-balls-deep/env/server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
+import { secureHeaders } from "hono/secure-headers";
+import { compress } from "hono/compress";
+import { prettyJSON } from "hono/pretty-json";
 
-const app = new Hono();
+// Middleware
+import { errorHandler } from "./middleware/error-handler";
 
-app.use(logger());
+// Routes
+import novels from "./routes/novels";
+import chapters from "./routes/chapters";
+import ratings from "./routes/ratings";
+
+// Types for Hono context
+type Env = {
+  Bindings: {
+    DB: D1Database;
+  };
+  Variables: {
+    user: { id: string; email: string } | null;
+  };
+};
+
+const app = new Hono<Env>();
+
+// Global middleware (order matters!)
+app.use("*", logger());
+app.use("*", secureHeaders());
+app.use("*", compress());
+
+// Pretty JSON in development only
+if (process.env.NODE_ENV === "development") {
+  app.use("*", prettyJSON());
+}
+
+// CORS (before routes)
 app.use(
-  "/*",
+  "/api/*",
   cors({
     origin: env.CORS_ORIGIN,
-    allowMethods: ["GET", "POST", "OPTIONS"],
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   }),
 );
 
+// Auth routes (Better-Auth)
 app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 
-app.get("/", (c) => {
-  return c.text("OK");
-});
+// API routes (domain-based)
+app.route("/api/novels", novels);
+app.route("/api/chapters", chapters);
+app.route("/api/ratings", ratings);
+
+// Health check
+app.get("/health", (c) => c.json({ status: "ok", timestamp: Date.now() }));
+
+// Root
+app.get("/", (c) => c.text("NovelVerse API"));
+
+// 404 handler
+app.notFound((c) => c.json({ error: "Not Found" }, 404));
+
+// Global error handler (must be last!)
+app.onError(errorHandler);
+
+// Export type for RPC client
+export type AppType = typeof app;
 
 export default app;
+

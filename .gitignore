@@ -47,4 +47,5 @@ coverage
 *.tgz
 .cache
 tmp
-temp
+temp.agents/
+.agent/
