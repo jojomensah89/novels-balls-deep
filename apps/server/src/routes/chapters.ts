@@ -4,7 +4,7 @@ import { db, eq, asc } from '@novels-balls-deep/db'
 import { chapter, translation, novel } from '@novels-balls-deep/db/schema'
 import { listChaptersSchema, chapterIdSchema } from '../schemas/chapters'
 
-const app = new Hono()
+export const app = new Hono()
 
 // List chapters for a translation
 app.get('/', zValidator('query', listChaptersSchema), async (c) => {

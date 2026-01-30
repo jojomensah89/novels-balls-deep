@@ -12,7 +12,7 @@ type Env = {
     }
 }
 
-const app = new Hono<Env>()
+export const app = new Hono<Env>()
 
 // Create or update rating
 app.post('/', requireAuth, zValidator('json', createRatingSchema), async (c) => {

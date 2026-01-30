@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
-import { db, eq, like, desc, asc, and } from '@novels-balls-deep/db'
+import { db, eq, like, desc, asc } from '@novels-balls-deep/db'
 import { novel } from '@novels-balls-deep/db/schema'
 import { listNovelsSchema, novelSlugSchema, searchSchema } from '../schemas/novels'
 import { optionalAuth } from '../middleware/auth'
@@ -11,7 +11,7 @@ type Env = {
     }
 }
 
-const app = new Hono<Env>()
+export const app = new Hono<Env>()
 
 // Search novels
 app.get('/search', zValidator('query', searchSchema), async (c) => {
