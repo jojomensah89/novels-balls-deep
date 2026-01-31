@@ -1,13 +1,30 @@
 "use client";
 
-import { ThemeProvider } from "./theme-provider";
-import { Toaster } from "./ui/sonner";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { ThemeProvider } from "next-themes";
+import { useState } from "react";
 
-export default function Providers({ children }: { children: React.ReactNode }) {
+export function Providers({ children }: { children: React.ReactNode }) {
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 60 * 1000, // 1 minute
+            refetchOnWindowFocus: false,
+          },
+        },
+      })
+  );
+
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-      {children}
-      <Toaster richColors />
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <NuqsAdapter>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          {children}
+        </ThemeProvider>
+      </NuqsAdapter>
+    </QueryClientProvider>
   );
 }

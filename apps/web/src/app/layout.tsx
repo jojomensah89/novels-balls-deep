@@ -4,7 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import "../index.css";
 import Header from "@/components/header";
-import Providers from "@/components/providers";
+import { Providers } from "@/components/providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "novels-balls-deep",
-  description: "novels-balls-deep",
+  title: "NovelVerse - Discover Translated Novels",
+  description: "Explore thousands of translated novels with community-rated translations",
 };
 
 export default function RootLayout({
@@ -39,3 +39,4 @@ export default function RootLayout({
     </html>
   );
 }
+

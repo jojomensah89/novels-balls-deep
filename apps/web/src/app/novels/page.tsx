@@ -1,3 +1,5 @@
+"use client";
+
 import { NovelGrid } from "@/components/novel/novel-grid";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,30 +11,45 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { novels } from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
+import { parseAsInteger, parseAsStringEnum, useQueryStates } from "nuqs";
+import { Loader2 } from "lucide-react";
 
-interface NovelsPageProps {
-    searchParams: {
-        page?: string;
-        limit?: string;
-        status?: "ongoing" | "completed" | "hiatus";
-        sortBy?: "popularity" | "rating" | "updated" | "title";
-        order?: "asc" | "desc";
-    };
-}
+const statusParser = parseAsStringEnum<"ongoing" | "completed" | "hiatus">([
+    "ongoing",
+    "completed",
+    "hiatus",
+]);
 
-export default async function NovelsPage({ searchParams }: NovelsPageProps) {
-    const page = searchParams.page || "1";
-    const limit = searchParams.limit || "24";
-    const status = searchParams.status;
-    const sortBy = searchParams.sortBy || "updated";
-    const order = searchParams.order || "desc";
+const sortByParser = parseAsStringEnum<
+    "popularity" | "rating" | "updated" | "title"
+>(["popularity", "rating", "updated", "title"]);
 
-    const { data: novelsList, pagination } = await novels.list({
-        page,
-        limit,
-        status,
-        sortBy,
-        order,
+export default function NovelsPage() {
+    const [params, setParams] = useQueryStates(
+        {
+            page: parseAsInteger.withDefault(1),
+            limit: parseAsInteger.withDefault(24),
+            status: statusParser,
+            sortBy: sortByParser.withDefault("updated"),
+            order: parseAsStringEnum(["asc", "desc"]).withDefault("desc"),
+        },
+        {
+            history: "push",
+        }
+    );
+
+    // Fetch novels with React Query
+    const { data, isLoading } = useQuery({
+        queryKey: ["novels", params],
+        queryFn: () =>
+            novels.list({
+                page: params.page.toString(),
+                limit: params.limit.toString(),
+                status: params.status || undefined,
+                sortBy: params.sortBy,
+                order: params.order,
+            }),
     });
 
     return (
@@ -42,7 +59,7 @@ export default async function NovelsPage({ searchParams }: NovelsPageProps) {
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold mb-2">Browse Novels</h1>
                     <p className="text-muted-foreground">
-                        Discover {novelsList.length} novels and counting
+                        Discover {data?.data.length || 0} novels and counting
                     </p>
                 </div>
 
@@ -51,33 +68,45 @@ export default async function NovelsPage({ searchParams }: NovelsPageProps) {
                     {/* Status Filter */}
                     <div className="flex gap-2">
                         <Badge
-                            variant={!status ? "default" : "outline"}
+                            variant={!params.status ? "default" : "outline"}
                             className="cursor-pointer"
+                            onClick={() => setParams({ status: null })}
                         >
                             All
                         </Badge>
                         <Badge
-                            variant={status === "ongoing" ? "default" : "outline"}
+                            variant={params.status === "ongoing" ? "default" : "outline"}
                             className="cursor-pointer"
+                            onClick={() => setParams({ status: "ongoing", page: 1 })}
                         >
                             Ongoing
                         </Badge>
                         <Badge
-                            variant={status === "completed" ? "default" : "outline"}
+                            variant={params.status === "completed" ? "default" : "outline"}
                             className="cursor-pointer"
+                            onClick={() => setParams({ status: "completed", page: 1 })}
                         >
                             Completed
                         </Badge>
                         <Badge
-                            variant={status === "hiatus" ? "default" : "outline"}
+                            variant={params.status === "hiatus" ? "default" : "outline"}
                             className="cursor-pointer"
+                            onClick={() => setParams({ status: "hiatus", page: 1 })}
                         >
                             Hiatus
                         </Badge>
                     </div>
 
                     {/* Sort */}
-                    <Select defaultValue={sortBy}>
+                    <Select
+                        value={params.sortBy}
+                        onValueChange={(value) =>
+                            setParams({
+                                sortBy: value as "popularity" | "rating" | "updated" | "title",
+                                page: 1,
+                            })
+                        }
+                    >
                         <SelectTrigger className="w-[180px]">
                             <SelectValue placeholder="Sort by" />
                         </SelectTrigger>
@@ -91,12 +120,22 @@ export default async function NovelsPage({ searchParams }: NovelsPageProps) {
                 </div>
 
                 {/* Novels Grid */}
-                <NovelGrid novels={novelsList} />
+                {isLoading ? (
+                    <div className="flex items-center justify-center py-12">
+                        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                    </div>
+                ) : (
+                    <NovelGrid novels={data?.data || []} />
+                )}
 
                 {/* Pagination */}
-                {pagination.hasMore && (
+                {data?.pagination.hasMore && (
                     <div className="mt-12 flex justify-center">
-                        <Button variant="outline" size="lg">
+                        <Button
+                            variant="outline"
+                            size="lg"
+                            onClick={() => setParams({ page: params.page + 1 })}
+                        >
                             Load More
                         </Button>
                     </div>
