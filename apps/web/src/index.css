@@ -125,4 +125,47 @@
   html {
     @apply font-sans;
   }
+
+  /* Reading-optimized typography */
+  .chapter-content {
+    font-family: 'Merriweather', Georgia, serif;
+    @apply text-lg leading-relaxed;
+  }
+
+  .chapter-content p {
+    @apply mb-4;
+  }
+
+  .chapter-content h1,
+  .chapter-content h2,
+  .chapter-content h3 {
+    font-family: 'Inter', sans-serif;
+    @apply font-semibold mb-3 mt-6;
+  }
 }
+
+@layer utilities {
+  /* Custom scrollbar */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/20 rounded-full;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/30;
+  }
+
+  /* Smooth transitions */
+  .transition-smooth {
+    @apply transition-all duration-200 ease-in-out;
+  }
+}
+
