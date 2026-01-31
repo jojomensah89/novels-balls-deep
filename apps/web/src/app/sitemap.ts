@@ -10,7 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             limit: "1000", // Adjust based on your needs
         });
 
-        const novelsList = response.data || [];
+        const novelsList = (response as any).data || [];
 
         // Static pages
         const staticPages: MetadataRoute.Sitemap = [

@@ -8,6 +8,7 @@
     "compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server"
   },
   "dependencies": {
+    "@hono/swagger-ui": "^0.5.3",
     "@hono/zod-validator": "^0.7.6",
     "@novels-balls-deep/auth": "workspace:*",
     "@novels-balls-deep/db": "workspace:*",

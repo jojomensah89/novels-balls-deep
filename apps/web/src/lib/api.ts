@@ -1,4 +1,18 @@
 import { env } from "@novels-balls-deep/env/web";
+import type {
+    Novel,
+    NovelDetail,
+    Chapter,
+    Translation,
+    Rating,
+    ReadingListItem,
+    ReadingProgress,
+    User,
+    UserPreferences,
+    AdminStats,
+    PaginatedResponse,
+    ApiResponse,
+} from "./api-types";
 
 /**
  * Base API client for making requests to the NovelVerse API
@@ -86,12 +100,20 @@ export const novels = {
         status?: "ongoing" | "completed" | "hiatus";
         sortBy?: "popularity" | "rating" | "updated" | "title";
         order?: "asc" | "desc";
-    }) => api.get("/api/novels", params as Record<string, string>),
+    }) =>
+        api.get<PaginatedResponse<Novel>>(
+            "/api/novels",
+            params as Record<string, string>
+        ),
 
     search: (params: { q: string; page?: string; limit?: string }) =>
-        api.get("/api/novels/search", params as Record<string, string>),
+        api.get<PaginatedResponse<Novel>>(
+            "/api/novels/search",
+            params as Record<string, string>
+        ),
 
-    getBySlug: (slug: string) => api.get(`/api/novels/${slug}`),
+    getBySlug: (slug: string) =>
+        api.get<ApiResponse<NovelDetail>>(`/api/novels/${slug}`),
 };
 
 /**
@@ -99,9 +121,12 @@ export const novels = {
  */
 export const chapters = {
     list: (params: { translationId: string; page?: string; limit?: string }) =>
-        api.get("/api/chapters", params as Record<string, string>),
+        api.get<PaginatedResponse<Chapter>>(
+            "/api/chapters",
+            params as Record<string, string>
+        ),
 
-    getById: (id: string) => api.get(`/api/chapters/${id}`),
+    getById: (id: string) => api.get<ApiResponse<Chapter>>(`/api/chapters/${id}`),
 };
 
 /**
@@ -115,16 +140,21 @@ export const translations = {
         limit?: string;
         sortBy?: "updated" | "chapters" | "rating";
         order?: "asc" | "desc";
-    }) => api.get("/api/translations", params as Record<string, string>),
+    }) =>
+        api.get<PaginatedResponse<Translation>>(
+            "/api/translations",
+            params as Record<string, string>
+        ),
 
-    getById: (id: string) => api.get(`/api/translations/${id}`),
+    getById: (id: string) =>
+        api.get<ApiResponse<Translation>>(`/api/translations/${id}`),
 
     create: (data: {
         novelId: string;
         translatorName: string;
         language: string;
         sourceUrl?: string;
-    }) => api.post("/api/translations", data),
+    }) => api.post<ApiResponse<Translation>>("/api/translations", data),
 
     update: (
         id: string,
@@ -133,7 +163,7 @@ export const translations = {
             sourceUrl?: string;
             status?: "active" | "dropped" | "completed";
         }
-    ) => api.patch(`/api/translations/${id}`, data),
+    ) => api.patch<ApiResponse<Translation>>(`/api/translations/${id}`, data),
 };
 
 /**
@@ -144,41 +174,42 @@ export const ratings = {
         translationId: string;
         rating: number;
         review?: string;
-    }) => api.post("/api/ratings", data),
+    }) => api.post<ApiResponse<Rating>>("/api/ratings", data),
 
-    delete: (id: string) => api.delete(`/api/ratings/${id}`),
+    delete: (id: string) => api.delete<ApiResponse<{ success: boolean }>>(`/api/ratings/${id}`),
 };
 
 /**
  * Reading API
  */
 export const reading = {
-    getList: () => api.get("/api/reading/list"),
+    getList: () => api.get<ApiResponse<ReadingListItem[]>>("/api/reading/list"),
 
     addToList: (data: {
         novelId: string;
         status: "reading" | "completed" | "plan_to_read" | "dropped";
-    }) => api.post("/api/reading/list", data),
+    }) => api.post<ApiResponse<ReadingListItem>>("/api/reading/list", data),
 
     updateListStatus: (
         id: string,
         data: { status: "reading" | "completed" | "plan_to_read" | "dropped" }
-    ) => api.patch(`/api/reading/list/${id}`, data),
+    ) => api.patch<ApiResponse<ReadingListItem>>(`/api/reading/list/${id}`, data),
 
-    removeFromList: (id: string) => api.delete(`/api/reading/list/${id}`),
+    removeFromList: (id: string) =>
+        api.delete<ApiResponse<{ success: boolean }>>(`/api/reading/list/${id}`),
 
     updateProgress: (data: { chapterId: string; progress: number }) =>
-        api.post("/api/reading/progress", data),
+        api.post<ApiResponse<ReadingProgress>>("/api/reading/progress", data),
 };
 
 /**
  * Users API
  */
 export const users = {
-    getMe: () => api.get("/api/users/me"),
+    getMe: () => api.get<ApiResponse<User>>("/api/users/me"),
 
-    updatePreferences: (data: unknown) =>
-        api.patch("/api/users/preferences", data),
+    updatePreferences: (data: Partial<UserPreferences>) =>
+        api.patch<ApiResponse<UserPreferences>>("/api/users/preferences", data),
 };
 
 /**
@@ -192,18 +223,22 @@ export const admin = {
         author: string;
         coverImage?: string;
         status: "ongoing" | "completed" | "hiatus";
-    }) => api.post("/api/admin/novels", data),
+    }) => api.post<ApiResponse<Novel>>("/api/admin/novels", data),
 
-    updateNovel: (id: string, data: Partial<{
-        title: string;
-        slug: string;
-        description: string;
-        author: string;
-        coverImage: string;
-        status: "ongoing" | "completed" | "hiatus";
-    }>) => api.patch(`/api/admin/novels/${id}`, data),
+    updateNovel: (
+        id: string,
+        data: Partial<{
+            title: string;
+            slug: string;
+            description: string;
+            author: string;
+            coverImage: string;
+            status: "ongoing" | "completed" | "hiatus";
+        }>
+    ) => api.patch<ApiResponse<Novel>>(`/api/admin/novels/${id}`, data),
 
-    deleteNovel: (id: string) => api.delete(`/api/admin/novels/${id}`),
+    deleteNovel: (id: string) =>
+        api.delete<ApiResponse<{ success: boolean }>>(`/api/admin/novels/${id}`),
 
-    getStats: () => api.get("/api/admin/stats"),
+    getStats: () => api.get<ApiResponse<AdminStats>>("/api/admin/stats"),
 };
