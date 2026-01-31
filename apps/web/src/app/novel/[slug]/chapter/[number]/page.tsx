@@ -1,6 +1,12 @@
 import { ChapterNav } from "@/components/chapter/chapter-nav";
 import { ReaderSettings } from "@/components/reading/reader-settings";
 import { chapters } from "@/lib/api";
+import { generateChapterMetadata } from "@/lib/seo/metadata";
+import {
+    generateArticleSchema,
+    generateBreadcrumbSchema,
+    renderStructuredData,
+} from "@/lib/seo/structured-data";
 import { notFound } from "next/navigation";
 
 interface ChapterPageProps {
@@ -8,6 +14,25 @@ interface ChapterPageProps {
         slug: string;
         number: string;
     };
+}
+
+export async function generateMetadata({ params }: ChapterPageProps) {
+    const chapterNumber = parseInt(params.number);
+
+    if (isNaN(chapterNumber)) {
+        return {
+            title: "Chapter Not Found",
+        };
+    }
+
+    // TODO: Fetch actual chapter data
+    return generateChapterMetadata({
+        novelTitle: "Novel Title", // TODO: Get from API
+        novelSlug: params.slug,
+        chapterNumber,
+        chapterTitle: "The Beginning",
+        content: "This is the first paragraph...",
+    });
 }
 
 export default async function ChapterPage({ params }: ChapterPageProps) {
@@ -37,56 +62,81 @@ export default async function ChapterPage({ params }: ChapterPageProps) {
     `,
     };
 
+    const novelTitle = "Novel Title"; // TODO: Get from API
     const totalChapters = 245; // Mock total
 
+    // Structured data
+    const articleSchema = generateArticleSchema({
+        novelTitle,
+        novelSlug: params.slug,
+        chapterNumber,
+        chapterTitle: chapter.title,
+        content: chapter.content,
+        wordCount: 500,
+    });
+
+    const breadcrumbSchema = generateBreadcrumbSchema([
+        { name: "Home", url: "/" },
+        { name: "Novels", url: "/novels" },
+        { name: novelTitle, url: `/novel/${params.slug}` },
+        {
+            name: `Chapter ${chapterNumber}`,
+            url: `/novel/${params.slug}/chapter/${chapterNumber}`,
+        },
+    ]);
+
     return (
-        <div className="min-h-screen">
-            {/* Chapter Navigation */}
-            <ChapterNav
-                novelSlug={params.slug}
-                currentChapter={chapterNumber}
-                totalChapters={totalChapters}
-                chapterTitle={chapter.title}
-            />
+        <>
+            {renderStructuredData(articleSchema)}
+            {renderStructuredData(breadcrumbSchema)}
+            <div className="min-h-screen">
+                {/* Chapter Navigation */}
+                <ChapterNav
+                    novelSlug={params.slug}
+                    currentChapter={chapterNumber}
+                    totalChapters={totalChapters}
+                    chapterTitle={chapter.title}
+                />
 
-            {/* Chapter Content */}
-            <main className="max-w-4xl mx-auto px-4 py-12">
-                <article className="chapter-content prose prose-slate dark:prose-invert max-w-none">
-                    <h1 className="text-3xl font-bold mb-8">
-                        Chapter {chapterNumber}: {chapter.title}
-                    </h1>
-                    <div dangerouslySetInnerHTML={{ __html: chapter.content }} />
-                </article>
+                {/* Chapter Content */}
+                <main className="max-w-4xl mx-auto px-4 py-12">
+                    <article className="chapter-content prose prose-slate dark:prose-invert max-w-none">
+                        <h1 className="text-3xl font-bold mb-8">
+                            Chapter {chapterNumber}: {chapter.title}
+                        </h1>
+                        <div dangerouslySetInnerHTML={{ __html: chapter.content }} />
+                    </article>
 
-                {/* Bottom Navigation */}
-                <div className="mt-16 pt-8 border-t">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            {chapterNumber > 1 && (
-                                <a
-                                    href={`/novel/${params.slug}/chapter/${chapterNumber - 1}`}
-                                    className="text-primary hover:underline"
-                                >
-                                    ← Previous Chapter
-                                </a>
-                            )}
-                        </div>
-                        <div>
-                            {chapterNumber < totalChapters && (
-                                <a
-                                    href={`/novel/${params.slug}/chapter/${chapterNumber + 1}`}
-                                    className="text-primary hover:underline"
-                                >
-                                    Next Chapter →
-                                </a>
-                            )}
+                    {/* Bottom Navigation */}
+                    <div className="mt-16 pt-8 border-t">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                {chapterNumber > 1 && (
+                                    <a
+                                        href={`/novel/${params.slug}/chapter/${chapterNumber - 1}`}
+                                        className="text-primary hover:underline"
+                                    >
+                                        ← Previous Chapter
+                                    </a>
+                                )}
+                            </div>
+                            <div>
+                                {chapterNumber < totalChapters && (
+                                    <a
+                                        href={`/novel/${params.slug}/chapter/${chapterNumber + 1}`}
+                                        className="text-primary hover:underline"
+                                    >
+                                        Next Chapter →
+                                    </a>
+                                )}
+                            </div>
                         </div>
                     </div>
-                </div>
-            </main>
+                </main>
 
-            {/* Reader Settings */}
-            <ReaderSettings />
-        </div>
+                {/* Reader Settings */}
+                <ReaderSettings />
+            </div>
+        </>
     );
 }
