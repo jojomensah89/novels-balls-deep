@@ -98,7 +98,7 @@ export const novels = {
         page?: string;
         limit?: string;
         status?: "ongoing" | "completed" | "hiatus";
-        sortBy?: "popularity" | "rating" | "updated" | "title";
+        sortBy?: "popularity" | "rating" | "updatedAt" | "title";
         order?: "asc" | "desc";
     }) =>
         api.get<PaginatedResponse<Novel>>(
@@ -138,7 +138,7 @@ export const translations = {
         language?: string;
         page?: string;
         limit?: string;
-        sortBy?: "updated" | "chapters" | "rating";
+        sortBy?: "updatedAt" | "chapters" | "rating";
         order?: "asc" | "desc";
     }) =>
         api.get<PaginatedResponse<Translation>>(

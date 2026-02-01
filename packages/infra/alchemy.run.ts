@@ -23,6 +23,7 @@ export const web = await Nextjs("web", {
     BETTER_AUTH_SECRET: alchemy.secret.env.BETTER_AUTH_SECRET!,
     BETTER_AUTH_URL: alchemy.env.BETTER_AUTH_URL!,
   },
+
 });
 
 export const server = await Worker("server", {
@@ -36,7 +37,7 @@ export const server = await Worker("server", {
     BETTER_AUTH_URL: alchemy.env.BETTER_AUTH_URL!,
   },
   dev: {
-    port: 3000,
+    port: 3001,
   },
 });
 
