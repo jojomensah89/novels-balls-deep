@@ -22,8 +22,8 @@ const statusParser = parseAsStringEnum<"ongoing" | "completed" | "hiatus">([
 ]);
 
 const sortByParser = parseAsStringEnum<
-    "popularity" | "rating" | "updated" | "title"
->(["popularity", "rating", "updated", "title"]);
+    "popularity" | "rating" | "updatedAt" | "title"
+>(["popularity", "rating", "updatedAt", "title"]);
 
 export default function NovelsPage() {
     const [params, setParams] = useQueryStates(
@@ -31,7 +31,7 @@ export default function NovelsPage() {
             page: parseAsInteger.withDefault(1),
             limit: parseAsInteger.withDefault(24),
             status: statusParser,
-            sortBy: sortByParser.withDefault("updated"),
+            sortBy: sortByParser.withDefault("updatedAt"),
             order: parseAsStringEnum(["asc", "desc"]).withDefault("desc"),
         },
         {
@@ -42,14 +42,20 @@ export default function NovelsPage() {
     // Fetch novels with React Query
     const { data, isLoading } = useQuery({
         queryKey: ["novels", params],
-        queryFn: () =>
-            novels.list({
+        queryFn: () => {
+            const queryParams: any = {
                 page: params.page.toString(),
                 limit: params.limit.toString(),
-                status: params.status || undefined,
                 sortBy: params.sortBy,
                 order: params.order,
-            }),
+            };
+
+            if (params.status) {
+                queryParams.status = params.status;
+            }
+
+            return novels.list(queryParams);
+        },
     });
 
     return (
@@ -102,7 +108,7 @@ export default function NovelsPage() {
                         value={params.sortBy}
                         onValueChange={(value) =>
                             setParams({
-                                sortBy: value as "popularity" | "rating" | "updated" | "title",
+                                sortBy: value as "popularity" | "rating" | "updatedAt" | "title",
                                 page: 1,
                             })
                         }
@@ -111,7 +117,7 @@ export default function NovelsPage() {
                             <SelectValue placeholder="Sort by" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="updated">Latest Updated</SelectItem>
+                            <SelectItem value="updatedAt">Latest Updated</SelectItem>
                             <SelectItem value="popularity">Most Popular</SelectItem>
                             <SelectItem value="rating">Highest Rated</SelectItem>
                             <SelectItem value="title">Title (A-Z)</SelectItem>
@@ -129,7 +135,7 @@ export default function NovelsPage() {
                 )}
 
                 {/* Pagination */}
-                {data?.pagination.hasMore && (
+                {data && data.pagination.page < data.pagination.totalPages && (
                     <div className="mt-12 flex justify-center">
                         <Button
                             variant="outline"

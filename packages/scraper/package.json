@@ -15,10 +15,11 @@
     "dependencies": {
         "axios": "catalog:",
         "cheerio": "^1.0.0",
-        "p-limit": "^6.1.0"
+        "p-limit": "^6.1.0",
     },
     "devDependencies": {
         "@types/node": "^22.13.14",
+        "playwright": "^1.58.1",
         "typescript": "catalog:"
     }
 }

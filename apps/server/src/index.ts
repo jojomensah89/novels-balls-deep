@@ -12,6 +12,7 @@ import { errorHandler } from "./middleware/error-handler";
 
 // Routes
 import novels from "./routes/novels";
+import scraper from "./routes/scraper";
 import chapters from "./routes/chapters";
 import ratings from "./routes/ratings";
 import translations from "./routes/translations";
@@ -23,6 +24,7 @@ import admin from "./routes/admin";
 type Env = {
   Bindings: {
     DB: D1Database;
+    MYBROWSER: Fetcher;
   };
   Variables: {
     user: { id: string; email: string } | null;
@@ -55,6 +57,7 @@ app.use(
 app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 
 // API routes (domain-based)
+app.route("/api/novels/scrape", scraper);
 app.route("/api/novels", novels);
 app.route("/api/chapters", chapters);
 app.route("/api/ratings", ratings);

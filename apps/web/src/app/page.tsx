@@ -1,6 +1,6 @@
 import { SearchBar } from "@/components/common/search-bar";
 import { NovelGrid } from "@/components/novel/novel-grid";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { novels } from "@/lib/api";
 import { generateHomeMetadata } from "@/lib/seo/metadata";
 import {
@@ -21,7 +21,7 @@ export default async function HomePage() {
 
   // Fetch latest updates
   const { data: latestNovels } = await novels.list({
-    sortBy: "updated",
+    sortBy: "updatedAt",
     limit: "12",
   });
 
@@ -52,12 +52,13 @@ export default async function HomePage() {
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold">Popular Novels</h2>
-              <Button variant="ghost" asChild>
-                <Link href="/novels?sortBy=popularity">
-                  View All
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
+              <Link
+                href="/novels?sortBy=popularity"
+                className={buttonVariants({ variant: "ghost" })}
+              >
+                View All
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
             </div>
             <NovelGrid novels={popularNovels} />
           </div>
@@ -68,12 +69,13 @@ export default async function HomePage() {
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold">Latest Updates</h2>
-              <Button variant="ghost" asChild>
-                <Link href="/novels?sortBy=updated">
-                  View All
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
+              <Link
+                href="/novels?sortBy=updatedAt"
+                className={buttonVariants({ variant: "ghost" })}
+              >
+                View All
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
             </div>
             <NovelGrid novels={latestNovels} />
           </div>
@@ -94,11 +96,13 @@ export default async function HomePage() {
                 "Horror",
                 "Comedy",
               ].map((genre) => (
-                <Button key={genre} variant="outline" asChild>
-                  <Link href={`/novels/genre/${genre.toLowerCase()}`}>
-                    {genre}
-                  </Link>
-                </Button>
+                <Link
+                  key={genre}
+                  href={`/novels/genre/${genre.toLowerCase()}` as any}
+                  className={buttonVariants({ variant: "outline" })}
+                >
+                  {genre}
+                </Link>
               ))}
             </div>
           </div>

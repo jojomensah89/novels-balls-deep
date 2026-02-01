@@ -1,16 +1,14 @@
-import { NovelBinSource } from "./index";
+import { NovelBinSource } from "./sources/novelbin";
+import { EmpireNovelSource } from "./sources/empirenovel";
+import { BrowserService } from "./browser-service";
 
-async function testScraper() {
-    console.log("🚀 Testing NovelBin scraper with 'Swallowed Star'...\n");
-
-    const scraper = new NovelBinSource({
-        maxConcurrency: 3,
-    });
+async function testSource(sourceName: string, source: any, query: string) {
+    console.log(`\n🚀 Testing ${sourceName} scraper with '${query}'...`);
 
     try {
-        // Search for Swallowed Star
-        console.log("📖 Searching for 'Swallowed Star'...");
-        const searchResults = await scraper.searchNovels("Swallowed Star");
+        // Search
+        console.log(`📖 Searching...`);
+        const searchResults = await source.searchNovels(query);
 
         if (searchResults.length === 0) {
             console.log("❌ No results found");
@@ -18,7 +16,7 @@ async function testScraper() {
         }
 
         console.log(`✅ Found ${searchResults.length} results:`);
-        searchResults.slice(0, 3).forEach((novel, i) => {
+        searchResults.slice(0, 3).forEach((novel: any, i: number) => {
             console.log(`  ${i + 1}. ${novel.title} - ${novel.sourceUrl}`);
         });
 
@@ -26,36 +24,52 @@ async function testScraper() {
         const novelUrl = searchResults[0].sourceUrl;
         console.log(`\n📚 Fetching novel details from: ${novelUrl}`);
 
-        const novel = await scraper.getNovel(novelUrl);
-        console.log(`\n✅ Novel Details:`);
+        const novel = await source.getNovel(novelUrl);
+        console.log(`✅ Novel Details:`);
         console.log(`  Title: ${novel.title}`);
         console.log(`  Author: ${novel.author}`);
         console.log(`  Status: ${novel.status}`);
         console.log(`  Genres: ${novel.genres?.join(", ")}`);
-        console.log(`  Description: ${novel.description?.substring(0, 150)}...`);
 
         // Get chapter list
         console.log(`\n📑 Fetching chapter list...`);
-        const chapterUrls = await scraper.getChapterList(novelUrl);
+        const chapterUrls = await source.getChapterList(novelUrl);
         console.log(`✅ Found ${chapterUrls.length} chapters`);
 
-        // Scrape first 3 chapters as test
+        // Scrape first chapter
         if (chapterUrls.length > 0) {
-            console.log(`\n📖 Scraping first 3 chapters...`);
-
-            for (let i = 0; i < Math.min(3, chapterUrls.length); i++) {
-                const chapter = await scraper.getChapter(chapterUrls[i]);
-                console.log(`  ✅ Chapter ${chapter.chapterNumber}: ${chapter.title || "Untitled"}`);
-                console.log(`     Content length: ${chapter.content.length} characters`);
-                console.log(`     Preview: ${chapter.content.substring(0, 100)}...`);
-            }
+            console.log(`\n📖 Scraping first chapter...`);
+            const chapter = await source.getChapter(chapterUrls[0]);
+            console.log(`  ✅ Chapter ${chapter.chapterNumber}: ${chapter.title || "Untitled"}`);
+            // console.log(`     Content length: ${chapter.content.length} characters`); // content is too long
         }
 
-        console.log("\n✨ Test completed successfully!");
-
     } catch (error) {
-        console.error("❌ Error:", error);
+        console.error(`❌ Error testing ${sourceName}:`, error);
     }
 }
 
-testScraper();
+async function runTests() {
+    const browserService = BrowserService.getInstance();
+
+    // Create an adapter to match BrowserProvider interface if needed
+    // BrowserService.getInstance() returns an object with getPage() so it matches loosely if unchecked,
+    // but BaseSource expects { getPage: () => Promise<Page> }
+    // Let's ensure strict type compat if we can, or just pass it if it matches structurally.
+    // BrowserService has getPage() returning Playwright Page. BaseSource expects any.
+
+    const provider = {
+        getPage: () => browserService.getPage(),
+        close: () => browserService.close()
+    };
+
+    const novelBin = new NovelBinSource({ browserProvider: provider });
+    await testSource("NovelBin", novelBin, "Swallowed Star");
+
+    const empireNovel = new EmpireNovelSource({ browserProvider: provider });
+    await testSource("EmpireNovel", empireNovel, "Swallowed Star");
+
+    await browserService.close();
+}
+
+runTests();

@@ -36,14 +36,19 @@ class ApiClient {
                 "Content-Type": "application/json",
                 ...options?.headers,
             },
-            credentials: "include", // Important for Better Auth cookies
+            credentials: "include",
         });
 
         if (!response.ok) {
-            const error = await response.json().catch(() => ({
+            const errorData = await response.json().catch(() => ({
                 error: "An error occurred",
             }));
-            throw new Error(error.error || `HTTP ${response.status}`);
+
+            const errorMessage = typeof errorData.error === 'string'
+                ? errorData.error
+                : JSON.stringify(errorData.error || errorData) || `HTTP ${response.status}`;
+
+            throw new Error(errorMessage);
         }
 
         return response.json();
@@ -241,4 +246,21 @@ export const admin = {
         api.delete<ApiResponse<{ success: boolean }>>(`/api/admin/novels/${id}`),
 
     getStats: () => api.get<ApiResponse<AdminStats>>("/api/admin/stats"),
+};
+
+/**
+ * Scraper API
+ */
+export const scraper = {
+    search: (sourceId: string, query: string) =>
+        api.get<any[]>("/api/novels/scrape", { action: "search", sourceId, query }),
+
+    getNovel: (sourceId: string, url: string) =>
+        api.get<any>("/api/novels/scrape", { action: "novel", sourceId, url }),
+
+    getChapters: (sourceId: string, url: string) =>
+        api.get<string[]>("/api/novels/scrape", { action: "chapters", sourceId, url }),
+
+    getChapter: (sourceId: string, url: string) =>
+        api.get<any>("/api/novels/scrape", { action: "chapter", sourceId, url }),
 };

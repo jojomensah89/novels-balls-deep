@@ -5,27 +5,27 @@ import type {
     ScrapedNovel,
     ScrapedChapter,
     ScraperOptions,
-    ProgressCallback,
 } from "../types";
 
 /**
- * NovelBin scraper implementation
- * Source: https://novelbin.com
+ * EmpireNovel scraper implementation
+ * Source: https://empirenovel.com
  */
-export class NovelBinSource extends BaseSource {
-    name = "NovelBin";
-    baseUrl = "https://novelbin.com";
-    private decoder = DECODERS.novelbin;
+export class EmpireNovelSource extends BaseSource {
+    name = "EmpireNovel";
+    baseUrl = "https://empirenovel.com";
+    private decoder = DECODERS.empirenovel;
 
     constructor(options: ScraperOptions = {}) {
         super(options);
         if (!this.decoder) {
-            throw new Error("NovelBin decoder not found");
+            throw new Error("EmpireNovel decoder not found");
         }
     }
 
     async searchNovels(query: string): Promise<ScrapedNovel[]> {
-        const searchUrl = `${this.baseUrl}/search?keyword=${encodeURIComponent(query)}`;
+        // EmpireNovel search usually is /?s=query or /search/query
+        const searchUrl = `${this.baseUrl}/?s=${encodeURIComponent(query)}`;
         const html = await this.fetchWithBrowser(searchUrl);
         const $ = cheerio.load(html);
 
@@ -126,63 +126,5 @@ export class NovelBinSource extends BaseSource {
             content,
             sourceUrl: chapterUrl,
         };
-    }
-
-    /**
-     * Scrape all chapters for a novel with progress tracking
-     */
-    async scrapeNovelWithChapters(
-        novelUrl: string,
-        onProgress?: ProgressCallback
-    ): Promise<{ novel: ScrapedNovel; chapters: ScrapedChapter[] }> {
-        // Get novel details
-        const novel = await this.getNovel(novelUrl);
-
-        // Get chapter list
-        const chapterUrls = await this.getChapterList(novelUrl);
-
-        const chapters: ScrapedChapter[] = [];
-        let completed = 0;
-        let errors = 0;
-
-        // Scrape chapters with concurrency limit
-        const tasks = chapterUrls.map((url, index) =>
-            this.limit(async () => {
-                try {
-                    const chapter = await this.getChapter(url);
-                    chapters[index] = chapter;
-                    completed++;
-
-                    if (onProgress) {
-                        onProgress({
-                            total: chapterUrls.length,
-                            completed,
-                            current: `Chapter ${chapter.chapterNumber}`,
-                            errors,
-                        });
-                    }
-                } catch (error) {
-                    errors++;
-                    console.error(`Failed to scrape chapter ${url}:`, error);
-
-                    if (onProgress) {
-                        onProgress({
-                            total: chapterUrls.length,
-                            completed,
-                            errors,
-                        });
-                    }
-                }
-            })
-        );
-
-        await Promise.all(tasks);
-
-        // Filter out failed chapters and sort by chapter number
-        const validChapters = chapters
-            .filter(Boolean)
-            .sort((a, b) => a.chapterNumber - b.chapterNumber);
-
-        return { novel, chapters: validChapters };
     }
 }

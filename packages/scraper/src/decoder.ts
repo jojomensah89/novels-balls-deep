@@ -137,4 +137,30 @@ export const DECODERS: Record<string, SiteDecoder> = {
             },
         },
     },
+    empirenovel: {
+        name: "EmpireNovel",
+        baseUrl: "https://empirenovel.com",
+        selectors: {
+            search: {
+                container: ".archive-item", // Placeholder
+                title: ".archive-title a",
+                url: ".archive-title a",
+                cover: "img",
+                author: ".author",
+            },
+            novel: {
+                title: "h1.entry-title",
+                cover: ".poster img",
+                author: ".author a",
+                description: ".description",
+                genres: ".genres a",
+                status: ".status",
+            },
+            chapterList: ".chapter-list a",
+            chapter: {
+                title: ".chapter-title",
+                content: ".entry-content",
+            },
+        },
+    },
 };

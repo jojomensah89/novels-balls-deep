@@ -9,7 +9,7 @@ interface NovelCardProps {
         id: string;
         slug: string;
         title: string;
-        coverImage?: string;
+        coverImage?: string | null;
         author: string;
         status: "ongoing" | "completed" | "hiatus";
         views?: number;

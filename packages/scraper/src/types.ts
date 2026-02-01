@@ -68,6 +68,12 @@ export interface ScraperOptions {
     retryDelay?: number;
     timeout?: number;
     userAgent?: string;
+    browserProvider?: BrowserProvider;
+}
+
+export interface BrowserProvider {
+    getPage: () => Promise<any>; // Using any to be compatible with Playwright/Puppeteer Page types
+    close: () => Promise<void>;
 }
 
 /**

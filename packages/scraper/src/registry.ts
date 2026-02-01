@@ -2,6 +2,7 @@ import { NovelBinSource } from "./sources/novelbin";
 import { RoyalRoadSource } from "./sources/royalroad";
 import { ScribbleHubSource } from "./sources/scribblehub";
 import { FreeWebNovelSource } from "./sources/freewebnovel";
+import { EmpireNovelSource } from "./sources/empirenovel";
 import type { Source, ScraperOptions } from "./types";
 
 /**
@@ -12,6 +13,7 @@ export const SOURCES = {
     royalroad: RoyalRoadSource,
     scribblehub: ScribbleHubSource,
     freewebnovel: FreeWebNovelSource,
+    empirenovel: EmpireNovelSource,
 } as const;
 
 export type SourceId = keyof typeof SOURCES;

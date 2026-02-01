@@ -1,6 +1,7 @@
-import type { Source, ScrapedNovel, ScrapedChapter, ScraperOptions } from "./types";
+import type { Source, ScrapedNovel, ScrapedChapter, ScraperOptions, BrowserProvider } from "./types";
 import pLimit from "p-limit";
 import { globalCache } from "./cache";
+
 
 /**
  * Abstract base class for all novel sources
@@ -10,7 +11,7 @@ export abstract class BaseSource implements Source {
     abstract name: string;
     abstract baseUrl: string;
 
-    protected options: Required<ScraperOptions>;
+    protected options: Required<Omit<ScraperOptions, "browserProvider">> & { browserProvider?: BrowserProvider };
     protected limit: ReturnType<typeof pLimit>;
 
     constructor(options: ScraperOptions = {}) {
@@ -20,9 +21,47 @@ export abstract class BaseSource implements Source {
             retryDelay: options.retryDelay ?? 1000,
             timeout: options.timeout ?? 30000,
             userAgent: options.userAgent ?? "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            browserProvider: options.browserProvider,
         };
 
         this.limit = pLimit(this.options.maxConcurrency);
+    }
+
+    /**
+     * Fetch HTML using Puppeteer headless browser
+     */
+    protected async fetchWithBrowser(url: string): Promise<string> {
+        // Check cache first
+        const cached = globalCache.get(url);
+        if (cached) return cached;
+
+        let page: any;
+
+        try {
+            if (this.options.browserProvider) {
+                page = await this.options.browserProvider.getPage();
+            } else {
+                throw new Error("No browser provider configured. Please inject a BrowserProvider or implement a local fallback.");
+            }
+
+            console.log(`BaseSource: Navigating to ${url}...`);
+            await page.goto(url, { waitUntil: "domcontentloaded", timeout: this.options.timeout });
+            console.log(`BaseSource: Navigation complete. Waiting for body...`);
+
+            // Wait for some content to ensure fully loaded (basic check)
+            await page.waitForSelector("body");
+
+            const content = await page.content();
+
+            globalCache.set(url, content);
+
+            return content;
+        } catch (error) {
+            console.error(`Browser fetch failed for ${url}:`, error);
+            throw error;
+        } finally {
+            if (page) await page.close();
+        }
     }
 
     /**
@@ -43,6 +82,8 @@ export abstract class BaseSource implements Source {
             });
 
             if (!response.ok) {
+                // If 403/503, try browser fallback? 
+                // For now, let's keep it explicit in the source implementation
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
 
