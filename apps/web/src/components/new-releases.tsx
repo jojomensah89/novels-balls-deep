@@ -13,74 +13,11 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay"
 
-const newReleases = [
-    {
-        id: 101,
-        title: "Void Emperor",
-        author: "Heavenly Ink",
-        genre: "Xianxia",
-        releaseDate: "Today",
-        cover: "from-violet-600 to-indigo-600",
-    },
-    {
-        id: 102,
-        title: "Cyber Samurai 2099",
-        author: "Neo Writer",
-        genre: "Sci-Fi",
-        releaseDate: "Today",
-        cover: "from-cyan-500 to-blue-600",
-    },
-    {
-        id: 103,
-        title: "The Last Alchemist",
-        author: "Golden Pen",
-        genre: "Fantasy",
-        releaseDate: "Yesterday",
-        cover: "from-amber-500 to-orange-600",
-    },
-    {
-        id: 104,
-        title: "Shadow Academy",
-        author: "Dark Scribe",
-        genre: "Urban Fantasy",
-        releaseDate: "Yesterday",
-        cover: "from-slate-600 to-zinc-700",
-    },
-    {
-        id: 105,
-        title: "Dragon's Heir",
-        author: "Storm Author",
-        genre: "Wuxia",
-        releaseDate: "2 days ago",
-        cover: "from-red-500 to-orange-600",
-    },
-    {
-        id: 106,
-        title: "Starbound Merchant",
-        author: "Cosmos Tales",
-        genre: "Space Opera",
-        releaseDate: "2 days ago",
-        cover: "from-purple-500 to-pink-600",
-    },
-    {
-        id: 107,
-        title: "Reborn as a Villain",
-        author: "Twist Master",
-        genre: "Reincarnation",
-        releaseDate: "3 days ago",
-        cover: "from-emerald-500 to-teal-600",
-    },
-    {
-        id: 108,
-        title: "Arcane Detective",
-        author: "Mystery Weaver",
-        genre: "Mystery",
-        releaseDate: "3 days ago",
-        cover: "from-rose-500 to-red-600",
-    },
-];
+interface NewReleasesProps {
+    releases: any[]; // Replace with specific type
+}
 
-export function NewReleases() {
+export function NewReleases({ releases = [] }: NewReleasesProps) {
     const isMobile = useIsMobile();
 
     return (
@@ -120,7 +57,7 @@ export function NewReleases() {
                     {/* Cards - Grid on mobile, Carousel on desktop */}
                     {isMobile ? (
                         <div className="grid grid-cols-2 gap-4">
-                            {newReleases.slice(0, 6).map((novel) => (
+                            {releases.slice(0, 6).map((novel) => (
                                 <Link
                                     key={novel.id}
                                     href={`/novel/${novel.id}`}
@@ -161,7 +98,7 @@ export function NewReleases() {
                         </div>
                     ) : (
                         <CarouselContent className="-ml-4">
-                            {newReleases.map((novel) => (
+                            {releases.map((novel) => (
                                 <CarouselItem
                                     key={novel.id}
                                     className="basis-auto pl-4"

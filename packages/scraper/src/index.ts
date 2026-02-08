@@ -9,4 +9,5 @@ export { DECODERS } from "./decoder";
 export type { SiteDecoder } from "./decoder";
 export { ChapterCache, globalCache } from "./cache";
 export { SOURCES, createSource, getAvailableSources } from "./registry";
-export type { SourceId } from "./registry";
+export * from "./dom-provider";
+

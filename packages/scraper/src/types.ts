@@ -68,13 +68,25 @@ export interface ScraperOptions {
     retryDelay?: number;
     timeout?: number;
     userAgent?: string;
-    browserProvider?: BrowserProvider;
+    browserProvider?: DomProvider;
 }
 
-export interface BrowserProvider {
-    getPage: () => Promise<any>; // Using any to be compatible with Playwright/Puppeteer Page types
+export interface PageLike {
+    goto(url: string, options?: any): Promise<any>;
+    waitForSelector(selector: string, options?: any): Promise<any>;
+    content(): Promise<string>;
+    close(): Promise<void>;
+    evaluate<R>(pageFunction: (args: any) => R, arg?: any): Promise<R>;
+    [key: string]: any; // Allow other methods loosely
+}
+
+export interface DomProvider {
+    getPage: () => Promise<PageLike>;
     close: () => Promise<void>;
 }
+
+// Backwards compatibility alias
+export type BrowserProvider = DomProvider;
 
 /**
  * Progress callback for scraping operations

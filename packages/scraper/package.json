@@ -15,7 +15,8 @@
     "dependencies": {
         "axios": "catalog:",
         "cheerio": "^1.0.0",
-        "p-limit": "^6.1.0",
+        "linkedom": "^0.18.12",
+        "p-limit": "^6.1.0"
     },
     "devDependencies": {
         "@types/node": "^22.13.14",

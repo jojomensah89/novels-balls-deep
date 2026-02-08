@@ -19,6 +19,7 @@ import translations from "./routes/translations";
 import reading from "./routes/reading";
 import users from "./routes/users";
 import admin from "./routes/admin";
+import home from "./routes/home";
 
 // Types for Hono context
 type Env = {
@@ -65,6 +66,7 @@ app.route("/api/translations", translations);
 app.route("/api/reading", reading);
 app.route("/api/users", users);
 app.route("/api/admin", admin);
+app.route("/api/home", home);
 
 // Health check
 app.get("/health", (c) => c.json({ status: "ok", timestamp: Date.now() }));
@@ -467,6 +469,61 @@ app.get("/spec", (c) =>
           responses: {
             "200": {
               description: "Server health status",
+            },
+          },
+        },
+      },
+      "/api/home/featured": {
+        get: {
+          summary: "Get featured novels",
+          tags: ["Home"],
+          responses: {
+            "200": {
+              description: "List of featured novels",
+            },
+          },
+        },
+      },
+      "/api/home/recent": {
+        get: {
+          summary: "Get recent updates",
+          tags: ["Home"],
+          responses: {
+            "200": {
+              description: "List of recent novels",
+            },
+          },
+        },
+      },
+      "/api/home/new": {
+        get: {
+          summary: "Get new releases",
+          tags: ["Home"],
+          responses: {
+            "200": {
+              description: "List of new novels",
+            },
+          },
+        },
+      },
+      "/api/home/popular": {
+        get: {
+          summary: "Get popular novels",
+          tags: ["Home"],
+          responses: {
+            "200": {
+              description: "List of popular novels",
+            },
+          },
+        },
+      },
+      "/api/home/genres": {
+        get: {
+          summary: "Get all genres",
+          tags: ["Home"],
+          responses: {
+            "200": {
+              description: "List of genres",
             },
           },
         },

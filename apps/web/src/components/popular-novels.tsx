@@ -5,70 +5,11 @@ import { Star, BookOpen, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-const popularNovels = [
-    {
-        id: 1,
-        title: "Solo Leveling",
-        author: "Chugong",
-        rating: 4.9,
-        views: "12.5M",
-        chapters: 270,
-        genres: ["Action", "Fantasy"],
-        cover: "from-violet-600 to-purple-800",
-    },
-    {
-        id: 2,
-        title: "The Beginning After The End",
-        author: "TurtleMe",
-        rating: 4.8,
-        views: "8.2M",
-        chapters: 421,
-        genres: ["Fantasy", "Reincarnation"],
-        cover: "from-blue-600 to-indigo-800",
-    },
-    {
-        id: 3,
-        title: "Omniscient Reader's Viewpoint",
-        author: "Singshong",
-        rating: 4.9,
-        views: "7.8M",
-        chapters: 551,
-        genres: ["Fantasy", "Apocalypse"],
-        cover: "from-emerald-500 to-teal-700",
-    },
-    {
-        id: 4,
-        title: "Lord of the Mysteries",
-        author: "Cuttlefish",
-        rating: 4.9,
-        views: "6.4M",
-        chapters: 1394,
-        genres: ["Mystery", "Fantasy"],
-        cover: "from-amber-500 to-orange-700",
-    },
-    {
-        id: 5,
-        title: "Reverend Insanity",
-        author: "Gu Zhen Ren",
-        rating: 4.8,
-        views: "5.9M",
-        chapters: 2334,
-        genres: ["Xianxia", "Dark"],
-        cover: "from-rose-500 to-red-700",
-    },
-    {
-        id: 6,
-        title: "Martial Peak",
-        author: "Momo",
-        rating: 4.7,
-        views: "5.1M",
-        chapters: 6009,
-        genres: ["Martial Arts", "Cultivation"],
-        cover: "from-cyan-500 to-blue-700",
-    },
-];
+interface PopularNovelsProps {
+    novels: any[];
+}
 
-export function PopularNovels() {
+export function PopularNovels({ novels = [] }: PopularNovelsProps) {
     const isMobile = useIsMobile();
 
     return (
@@ -86,7 +27,7 @@ export function PopularNovels() {
 
                 {/* Novel Grid - Single column on mobile, multi-column on larger screens */}
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {(isMobile ? popularNovels.slice(0, 4) : popularNovels).map((novel, index) => (
+                    {(isMobile ? novels.slice(0, 4) : novels).map((novel, index) => (
                         <Link key={novel.id} href={`/novel/${novel.id}`} className="group">
                             <div className="relative flex gap-3 overflow-hidden rounded-lg border border-border/50 bg-card p-3 transition-all duration-300 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10 sm:gap-4 sm:p-4">
                                 {/* Ranking Number */}
@@ -114,7 +55,7 @@ export function PopularNovels() {
                                             {novel.author}
                                         </p>
                                         <div className="mt-1.5 flex flex-wrap gap-1 sm:mt-2">
-                                            {novel.genres.map((genre) => (
+                                            {novel.genres?.map((genre: string) => (
                                                 <Badge
                                                     key={genre}
                                                     variant="outline"

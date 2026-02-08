@@ -6,64 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
-const featuredNovels = [
-    {
-        id: 1,
-        title: "The Shadow Monarch's Return",
-        author: "DragonScribe",
-        rating: 4.8,
-        views: "2.4M",
-        chapters: 847,
-        status: "Ongoing",
-        genres: ["Fantasy", "Action", "Adventure"],
-        synopsis:
-            "After ten thousand years of slumber, the Shadow Monarch awakens to find a world that has forgotten his name. With his ancient powers sealed and enemies lurking in every corner, he must rise from the ashes and reclaim his throne—one kingdom at a time.",
-        gradient: "from-primary/60 via-accent/40 to-secondary",
-    },
-    {
-        id: 2,
-        title: "Celestial Cultivation Chronicles",
-        author: "ImmortalPen",
-        rating: 4.9,
-        views: "3.1M",
-        chapters: 1203,
-        status: "Ongoing",
-        genres: ["Cultivation", "Fantasy", "Romance"],
-        synopsis:
-            "Born with crippled meridians, Li Xuan was destined to be a mortal in a world of immortals. But when he discovers an ancient jade pendant containing the memories of a fallen celestial, his fate takes an extraordinary turn toward the heavens.",
-        gradient: "from-accent/60 via-primary/40 to-chart-3/30",
-    },
-    {
-        id: 3,
-        title: "System Apocalypse: Earth Reborn",
-        author: "DigitalDreamer",
-        rating: 4.7,
-        views: "1.8M",
-        chapters: 562,
-        status: "Ongoing",
-        genres: ["LitRPG", "Post-Apocalyptic", "Action"],
-        synopsis:
-            "When the System descended upon Earth, humanity was given a choice: adapt or perish. Marcus Chen, an ordinary game developer, discovers his years of gaming experience might be the key to survival in this new world of levels, skills, and monsters.",
-        gradient: "from-chart-5/60 via-primary/40 to-accent/30",
-    },
-    {
-        id: 4,
-        title: "The Villainess Redemption Path",
-        author: "MoonlitQuill",
-        rating: 4.6,
-        views: "2.1M",
-        chapters: 389,
-        status: "Completed",
-        genres: ["Romance", "Fantasy", "Isekai"],
-        synopsis:
-            "Reborn as the villainess destined to die at the hands of the heroine, Lady Elara decides to rewrite her fate. Armed with knowledge of the plot and a determination to survive, she navigates court intrigue while accidentally capturing hearts she never intended to claim.",
-        gradient: "from-chart-4/60 via-chart-5/40 to-primary/30",
-    },
-];
-
 const ROTATION_INTERVAL = 10000;
 
-export function HeroSection() {
+interface HeroSectionProps {
+    featuredNovels: any[];
+}
+
+export function HeroSection({ featuredNovels = [] }: HeroSectionProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isTransitioning, setIsTransitioning] = useState(false);
 
@@ -85,6 +34,10 @@ export function HeroSection() {
     }, [currentIndex, goToSlide]);
 
     const currentNovel = featuredNovels[currentIndex];
+
+    if (!currentNovel) {
+        return null;
+    }
 
     return (
         <section className="relative min-h-[auto] overflow-hidden pt-16 md:min-h-[85vh]">
@@ -128,7 +81,7 @@ export function HeroSection() {
                 >
                     {/* Genres */}
                     <div className="mb-4 flex flex-wrap justify-center gap-2 md:justify-start">
-                        {currentNovel.genres.map((genre) => (
+                        {currentNovel.genres?.map((genre: string) => (
                             <Badge
                                 key={genre}
                                 variant="outline"

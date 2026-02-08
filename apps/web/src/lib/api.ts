@@ -264,3 +264,14 @@ export const scraper = {
     getChapter: (sourceId: string, url: string) =>
         api.get<any>("/api/novels/scrape", { action: "chapter", sourceId, url }),
 };
+
+/**
+ * Home Page API
+ */
+export const home = {
+    getFeatured: () => api.get<ApiResponse<any[]>>("/api/home/featured"),
+    getRecentUpdates: () => api.get<ApiResponse<any[]>>("/api/home/recent"),
+    getNewReleases: () => api.get<ApiResponse<any[]>>("/api/home/new"),
+    getPopular: () => api.get<ApiResponse<any[]>>("/api/home/popular"),
+    getGenres: () => api.get<ApiResponse<any[]>>("/api/home/genres"),
+};

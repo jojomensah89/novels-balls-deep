@@ -13,66 +13,11 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay"
 
-const recentUpdates = [
-    {
-        id: 1,
-        title: "Martial Peak",
-        chapter: "Chapter 2847",
-        timeAgo: "12 min ago",
-        cover: "from-blue-600 to-purple-600",
-    },
-    {
-        id: 2,
-        title: "Solo Leveling",
-        chapter: "Chapter 179",
-        timeAgo: "24 min ago",
-        cover: "from-violet-600 to-pink-600",
-    },
-    {
-        id: 3,
-        title: "Tales of Demons and Gods",
-        chapter: "Chapter 489",
-        timeAgo: "1 hour ago",
-        cover: "from-orange-500 to-red-600",
-    },
-    {
-        id: 4,
-        title: "Against the Gods",
-        chapter: "Chapter 1892",
-        timeAgo: "2 hours ago",
-        cover: "from-emerald-500 to-teal-600",
-    },
-    {
-        id: 5,
-        title: "I Shall Seal the Heavens",
-        chapter: "Chapter 1614",
-        timeAgo: "3 hours ago",
-        cover: "from-cyan-500 to-blue-600",
-    },
-    {
-        id: 6,
-        title: "Coiling Dragon",
-        chapter: "Chapter 806",
-        timeAgo: "4 hours ago",
-        cover: "from-amber-500 to-orange-600",
-    },
-    {
-        id: 7,
-        title: "Desolate Era",
-        chapter: "Chapter 1234",
-        timeAgo: "5 hours ago",
-        cover: "from-rose-500 to-pink-600",
-    },
-    {
-        id: 8,
-        title: "The Beginning After The End",
-        chapter: "Chapter 421",
-        timeAgo: "6 hours ago",
-        cover: "from-indigo-500 to-violet-600",
-    },
-];
+interface RecentUpdatesProps {
+    updates: any[]; // Replace with specific type if available
+}
 
-export function RecentUpdates() {
+export function RecentUpdates({ updates = [] }: RecentUpdatesProps) {
     const isMobile = useIsMobile();
 
     return (
@@ -110,7 +55,7 @@ export function RecentUpdates() {
                     {/* Cards - Grid on mobile, Carousel on desktop */}
                     {isMobile ? (
                         <div className="grid grid-cols-2 gap-4">
-                            {recentUpdates.slice(0, 6).map((novel) => (
+                            {updates.slice(0, 6).map((novel) => (
                                 <Link
                                     key={novel.id}
                                     href={`/novel/${novel.id}`}
@@ -145,7 +90,7 @@ export function RecentUpdates() {
                         </div>
                     ) : (
                         <CarouselContent className="-ml-4">
-                            {recentUpdates.map((novel) => (
+                            {updates.map((novel) => (
                                 <CarouselItem
                                     key={novel.id}
                                     className="basis-auto pl-4"

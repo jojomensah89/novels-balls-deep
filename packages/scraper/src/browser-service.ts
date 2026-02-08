@@ -1,6 +1,7 @@
 import { chromium, type Browser, type BrowserContext, type Page } from "playwright";
+import type { DomProvider } from "./types";
 
-export class BrowserService {
+export class BrowserService implements DomProvider {
     private static instance: BrowserService;
     private browser: Browser | null = null;
     private context: BrowserContext | null = null;
@@ -19,15 +20,15 @@ export class BrowserService {
         if (!this.browser || !this.browser.isConnected()) {
             console.log("BrowserService: Launching chromium...");
             this.browser = await chromium.launch({
-                headless: true, // Set to false for debugging
+                headless: false, // Set to false for debugging
                 args: [
                     "--no-sandbox",
                     "--disable-setuid-sandbox",
                     "--disable-infobars",
                     "--window-position=0,0",
-                    "--ignore-certifcate-errors",
-                    "--ignore-certifcate-errors-spki-list",
-                    "--disable-blink-features=AutomationControlled", // Key for stealth
+                    "--ignore-certificate-errors",
+                    "--ignore-certificate-errors-spki-list",
+                    // "--disable-blink-features=AutomationControlled", // Key for stealth
                 ],
             });
 

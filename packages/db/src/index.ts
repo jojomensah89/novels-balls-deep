@@ -8,4 +8,4 @@ export const db = drizzle(env.DB);
 export * as schema from "./schema";
 
 // Re-export drizzle-orm functions to avoid version conflicts
-export { eq, like, desc, asc, and, or } from "drizzle-orm";
+export { eq, like, desc, asc, and, or, sql } from "drizzle-orm";
